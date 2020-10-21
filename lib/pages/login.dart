@@ -16,7 +16,7 @@ class _LoginState extends State<Login> {
       obscureText: false,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        hintText: "User Name",
+        hintText: "Name",
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
@@ -26,7 +26,7 @@ class _LoginState extends State<Login> {
       obscureText: true,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        hintText: "Password",
+        hintText: "Staff ID",
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
