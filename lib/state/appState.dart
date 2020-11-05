@@ -61,6 +61,7 @@ class Auth with ChangeNotifier {
   String staffId = "";
   String token;
   String id = "";
+  int page = 0;
 
   // Check if a user id logedin
   getIsLogged() async {
@@ -107,6 +108,15 @@ class Auth with ChangeNotifier {
       this.token = token;
     });
     return token;
+  }
+
+  setHomePageTabFun(index) async {
+    this.page = index;
+    notifyListeners();
+  }
+
+  getHomePageTabFun() {
+    return page;
   }
 
 
