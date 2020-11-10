@@ -54,6 +54,47 @@ class _CheckInPageState extends State<CheckInPage> {
       ),
     );
 
+    workedHours() {
+      return Center(
+        child: Container(
+          margin: EdgeInsets.all(10),
+          padding: EdgeInsets.all(10),
+          width: 200,
+          height: 200,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "Total Worked hours",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "18:00",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(width: 3),
+            borderRadius: BorderRadius.all(
+              Radius.circular(200),
+            ),
+          ),
+        ),
+      );
+    }
+
     final userImage = Center(
         child: Container(
             padding: EdgeInsets.all(4),
@@ -79,7 +120,7 @@ class _CheckInPageState extends State<CheckInPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SizedBox(height: 15.0),
-                userImage,
+                workedHours(),
                 SizedBox(height: 35.0),
                 checkInButton,
                 SizedBox(height: 15.0),
