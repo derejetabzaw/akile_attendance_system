@@ -12,6 +12,16 @@ class Constant{
   static const String SUBMIT ='Submit';
   static const String SUCCESS="Success";
 
+  //alert Messages
+  static const String success="Your request done successfuly";
+  static const String error="Unable to perform the action!";
+
+  // Icon type
+  static const String successIcon="success";
+  static const String errorIcon="error";
+  static const String warningIcon="warning";
+  static const String infoIcon="info";
+
 
   static ThemeData lightTheme = ThemeData(
     fontFamily: "TimesNewRoman",
