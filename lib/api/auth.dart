@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 
 /*================== Login Api ===============================*/
 Future<JsonUser> loginApi({staffId, password, context}) async {
+  Map<String, String> headers = {"Content-type": "application/json"};
   var params = {
     "staffId": staffId,
     "password": password,
@@ -18,6 +19,7 @@ Future<JsonUser> loginApi({staffId, password, context}) async {
   String error;
   try {
     final response = await http.post(API.LOGIN_API,
+        headers: headers,
         body: json.encode(params));
     switch (response.statusCode) {
       case 200:

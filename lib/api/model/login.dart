@@ -1,16 +1,14 @@
 class JsonUser {
-  String accessToken,staffId;
+  String accessToken;
 
-  JsonUser({accessToken, refreshToken,staffId}) {
+  JsonUser({accessToken}) {
     this.accessToken=accessToken;
-    this.staffId=staffId;
 
   }
 
   factory JsonUser.fromJson(Map<String, dynamic> parsedJson) {
     return JsonUser(
       accessToken: parsedJson['accessToken'],
-      staffId: parsedJson['staffId'],
     );
   }
 }
