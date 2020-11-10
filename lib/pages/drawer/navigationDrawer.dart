@@ -112,7 +112,7 @@ class _SideDrawer extends State<SideDrawer> implements ShouldImp {
                           children: [
                             Container(
                               child: RoundedLetter(
-                                text: getRoundLetter(getEmail(context))
+                                text: getRoundLetter(getStaffId(context))
                                     .toUpperCase(),
                                 shapeType: ShapeType.circle,
                                 shapeColor: PRIMARY_COLOR.withOpacity(0.5),
@@ -125,7 +125,7 @@ class _SideDrawer extends State<SideDrawer> implements ShouldImp {
                             SizedBox(height: 15.0),
                             Expanded(
                               child: Text(
-                                getEmail(context),
+                                getStaffId(context),
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16.0,
@@ -142,14 +142,14 @@ class _SideDrawer extends State<SideDrawer> implements ShouldImp {
                 ),
               ),
 
-              // ListTile(
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //     Navigator.push(
-              //         context, SlideLeftRoute(page: ContactListPage()));
-              //   },
-              //   title: _buildRow(Icons.timeline, "Contact Sync"),
-              // ),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  // Navigator.push(
+                  //     context, SlideLeftRoute(page()));
+                },
+                title: _buildRow(Icons.timeline, "Change Password"),
+              ),
               Divider(),
               ListTile(
                 onTap: () {},
