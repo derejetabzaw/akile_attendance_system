@@ -67,15 +67,15 @@ class HomePage extends State<Home> implements ShouldImp {
         selectedItemColor: PRIMARY_COLOR,
         items: [
           BottomNavigationBarItem(
-            icon: new Icon(Icons.event),
+            icon: new Icon(Icons.home),
             title: new Text('Home'),
           ),
           BottomNavigationBarItem(
-            icon: new Icon(Icons.contact_mail),
+            icon: new Icon(Icons.assignment),
             title: new Text('Assignments'),
           ),
           BottomNavigationBarItem(
-            icon: new Icon(Icons.contacts),
+            icon: new Icon(Icons.notifications),
             title: new Text('Notifications'),
           )
         ],
