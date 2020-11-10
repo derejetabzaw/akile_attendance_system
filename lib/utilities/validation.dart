@@ -18,10 +18,6 @@ validatePassword(String value) {
   if (value.isEmpty) {
     return "Enter Password field";
   }
-  if (value.length < 8) {
-    return 'Your password is too weak';
-  }
-
   return "";
 }
 
