@@ -1,44 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:akile_attendance_system/pages/assignments.dart';
+import 'package:akile_attendance_system/pages/notifications.dart';
+import 'package:akile_attendance_system/pages/checkIn.dart';
+import 'package:akile_attendance_system/pages/drawer/navigationDrawer.dart';
+import 'package:akile_attendance_system/utilities/abstract_classes/confirmation_abstract.dart';
+import 'package:akile_attendance_system/constants/colors.dart';
+import 'package:akile_attendance_system/state/appState.dart';
+import 'package:akile_attendance_system/utilities/get_size.dart';
+import 'package:provider/provider.dart';
 
-class Home extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: HomePage());
-  }
+class Home extends StatefulWidget{
+  HomePage createState()=>HomePage();
 }
-
-class HomePage extends StatefulWidget {
+class HomePage extends State<Home> implements ShouldImp {
   @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Home'),
-          actions: <Widget>[
-            IconButton(
-                icon: Icon(Icons.exit_to_app, color: Colors.white),
-                onPressed: () {
-                  //  change inital load state to true and log out the user
-                  logout();
-                })
-          ],
-        ),
-        body: Center(
-            child: Text("Welcome to Akile attendance management system")));
+  void changer({context, id}) {
   }
 
-  void logout() async {
-    try {
-      // logout the user
-      // change loading state to false
-      // route to Login page
-      Navigator.of(context).pushReplacementNamed('login');
-    } catch (e) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+  pageTaped(page) {
+    switch ( Provider.of<Auth>(context,listen: false).getHomePageTabFun()) {
+      case 0:
+        return CheckIn();
+        break;
+      case 1:
+        return Assignments();
+        break;
+      default:
+        return Notifications();
     }
+  }
+
+  getTitle(context) {
+    if (Provider.of<Auth>(context,listen: false).getHomePageTabFun() == 0)
+      return "Home";
+    else if (Provider.of<Auth>(context,listen: false).getHomePageTabFun()  == 1)
+      return "Assignments";
+    else
+      return "Notifications";
+  }
+
+  void onTabTapped(int index) {
+    Provider.of<Auth>(context,listen: false).setHomePageTabFun(index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return  Scaffold(
+      appBar: AppBar(
+        title: Text(getTitle(context), style: TextStyle(color: Colors.white)),
+        iconTheme: IconThemeData(color: TRIAL_COLOR),
+      ),
+      drawer: Container(
+        width: getWidth(context)*0.75,
+        height: getHeight(context),
+        child: SideDrawer(),
+      ),
+      body: Container(
+        child: Center(
+          child: pageTaped(Provider.of<Auth>(context).getHomePageTabFun()),
+        ),
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: Provider.of<Auth>(context).getHomePageTabFun() ,
+
+        selectedItemColor: PRIMARY_COLOR,
+        items: [
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.event),
+            title: new Text('Home'),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.contact_mail),
+            title: new Text('Assignments'),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.contacts),
+            title: new Text('Notifications'),
+          )
+        ],
+        onTap: onTabTapped,
+      ),
+    );
   }
 }
