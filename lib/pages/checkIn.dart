@@ -28,7 +28,6 @@ class _CheckInPageState extends State<CheckInPage> {
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
           // Check user credentials are correct and route to the home screen
-          Navigator.of(context).pushReplacementNamed('home');
         },
         child: Text(
           "CheckIn",
@@ -45,7 +44,6 @@ class _CheckInPageState extends State<CheckInPage> {
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
           // Check user credentials are correct and route to the home screen
-          Navigator.of(context).pushReplacementNamed('home');
         },
         child: Text(
           "CheckOut",
@@ -95,20 +93,20 @@ class _CheckInPageState extends State<CheckInPage> {
       );
     }
 
-    final userImage = Center(
-        child: Container(
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(width: 1, color: Colors.black)),
-            child: Container(
-                height: 200,
-                width: 200,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: AssetImage("assets/logo.jpg"),
-                        fit: BoxFit.cover)))));
+    // final userImage = Center(
+    //     child: Container(
+    //         padding: EdgeInsets.all(4),
+    //         decoration: BoxDecoration(
+    //             shape: BoxShape.circle,
+    //             border: Border.all(width: 1, color: Colors.black)),
+    //         child: Container(
+    //             height: 200,
+    //             width: 200,
+    //             decoration: BoxDecoration(
+    //                 shape: BoxShape.circle,
+    //                 image: DecorationImage(
+    //                     image: AssetImage("assets/logo.jpg"),
+    //                     fit: BoxFit.cover)))));
 
     return Scaffold(
       body: Center(
