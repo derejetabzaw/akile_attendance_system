@@ -8,13 +8,14 @@ import 'package:provider/provider.dart';
 logo(context) {
   AppState themeNotifier = Provider.of<AppState>(context);
   return Container(
-    height: 90,
+    height: 100,
+    width: 70,
     alignment: Alignment.center,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       gradient: LinearGradient(colors: [PRIMARY_COLOR, SECONDARY_COLOR]),
       image: DecorationImage(
-        image: themeNotifier.getTheme()==Constant.lightTheme? AssetImage("assets/logo.jpg"): AssetImage("assets/logo.jpg"),
+        image: themeNotifier.getTheme()==Constant.lightTheme? AssetImage("assets/AKILLE-01.jpg"): AssetImage("assets/AKILLE-01.jpg"),
       ),
     ),
   );
