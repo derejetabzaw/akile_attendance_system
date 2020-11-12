@@ -5,7 +5,6 @@ import 'package:akile_attendance_system/constants/colors.dart';
 import 'package:akile_attendance_system/constants/constant.dart';
 import 'package:akile_attendance_system/pages/SharedPreference/sharedPreference.dart';
 import 'package:akile_attendance_system/pages/dialog/confirmationDialog.dart';
-import 'package:akile_attendance_system/pages/slider/slider.dart';
 import 'package:akile_attendance_system/pages/widgets/custom_shape.dart';
 import 'package:akile_attendance_system/state/appState.dart';
 import 'package:akile_attendance_system/utilities/abstract_classes/confirmation_abstract.dart';
