@@ -11,6 +11,7 @@ class Constant{
   static const String SEARCH_DISPLAY="search_display";
   static const String SUBMIT ='Submit';
   static const String SUCCESS="Success";
+  static const String ALERT="ALERT";
 
   //alert Messages
   static const String success="Your request done successfuly";
