@@ -48,3 +48,46 @@ Future<JsonUser> loginApi({staffId, password, context}) async {
   }
 }
 
+
+/*================== Checkin Api ===============================*/
+checkInApi({deviceId, token, context}) async {
+  Map<String, String> headers = {
+    "Content-type": "application/json",
+    "Authorization": token
+    };
+  var params = {
+    "deviceId": deviceId,
+  };
+
+  String error;
+  try {
+    final response = await http.post(API.CHECKIN,
+        headers: headers,
+        body: json.encode(params));
+    switch (response.statusCode) {
+      case 200:
+        return true;
+        break;
+      case 201:
+        return true;
+        break;
+
+      default:
+        return Future.error(errorMethod(response));
+    }
+  }
+  on SocketException catch(_){
+    error = 'No Internet connection 😑';
+    throw error;
+  } on HttpException catch(_){
+    error = "Couldn't find the post 😱";
+    throw error;
+  } on FormatException catch(_){
+    error = "Bad response format 👎";
+    throw error;
+  } on Exception catch(_) {
+    error = "We have not idea what happend!";
+    throw error;
+  }
+}
+
