@@ -1,4 +1,14 @@
+import 'package:akile_attendance_system/utilities/abstract_classes/confirmation_abstract.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:akile_attendance_system/constants/constant.dart';
+import 'package:akile_attendance_system/state/appState.dart';
+import 'package:akile_attendance_system/api/auth.dart';
+import 'package:akile_attendance_system/pages/dialog/infoDialog.dart';
+import 'package:device_id/device_id.dart';
+
+
+
 
 class CheckIn extends StatelessWidget {
   @override
@@ -9,16 +19,56 @@ class CheckIn extends StatelessWidget {
 }
 
 class CheckInPage extends StatefulWidget {
-  CheckInPage({Key key, this.title}) : super(key: key);
+  CheckInPage({Key key}) : super(key: key);
 
-  final String title;
 
   _CheckInPageState createState() => _CheckInPageState();
 }
 
-class _CheckInPageState extends State<CheckInPage> {
+class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
+  bool showError = false;
+
   @override
   Widget build(BuildContext context) {
+
+    submitCheckIn() async{
+      // const String deviceId = "123";
+      String device_id = await DeviceId.getID;
+      print("the device id is");
+      print(device_id);
+      String token = Provider.of<Auth>(context, listen: false).getTokenFun();
+      Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
+      
+
+      var _checkIn = checkInApi(
+        deviceId: device_id,
+        token: token,
+        context: context
+      );
+
+      _checkIn.then((value) {
+        if (value == true) {
+          Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+          InfoDialog(
+            context: context,
+            callback: _CheckInPageState(),
+            title: "you have checked in successfully",
+            type: Constant.success
+          );
+        }
+      });
+
+      _checkIn.catchError((value) {
+        Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
+        Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+        InfoDialog(
+            context: context,
+            callback: _CheckInPageState(),
+            title: value,
+            type: Constant.ALERT
+          );
+      });
+    }
 
     final checkInButton = Material(
       elevation: 5.0,
@@ -28,6 +78,7 @@ class _CheckInPageState extends State<CheckInPage> {
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
           // Check user credentials are correct and route to the home screen
+          submitCheckIn();
         },
         child: Text(
           "CheckIn",
@@ -93,21 +144,6 @@ class _CheckInPageState extends State<CheckInPage> {
       );
     }
 
-    // final userImage = Center(
-    //     child: Container(
-    //         padding: EdgeInsets.all(4),
-    //         decoration: BoxDecoration(
-    //             shape: BoxShape.circle,
-    //             border: Border.all(width: 1, color: Colors.black)),
-    //         child: Container(
-    //             height: 200,
-    //             width: 200,
-    //             decoration: BoxDecoration(
-    //                 shape: BoxShape.circle,
-    //                 image: DecorationImage(
-    //                     image: AssetImage("assets/logo.jpg"),
-    //                     fit: BoxFit.cover)))));
-
     return Scaffold(
       body: Center(
         child: Container(
@@ -129,5 +165,9 @@ class _CheckInPageState extends State<CheckInPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void changer({context, id}) {
   }
 }

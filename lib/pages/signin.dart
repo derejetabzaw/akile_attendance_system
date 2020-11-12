@@ -61,6 +61,7 @@ class _LoginPageState extends State<SignInPage> {
       _loginModel.then((value) async {
         savePref(
           accessToken: value.accessToken,
+          staffId: value.staffId
         );
         Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
         Navigator.push(context, SlideLeftRoute(
