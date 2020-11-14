@@ -33,15 +33,15 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
 
     submitCheckIn() async{
       // const String deviceId = "123";
-      String device_id = await DeviceId.getID;
+      String deviceId = await DeviceId.getID;
       print("the device id is");
-      print(device_id);
+      print(deviceId);
       String token = Provider.of<Auth>(context, listen: false).getTokenFun();
       Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
       
 
       var _checkIn = checkInApi(
-        deviceId: device_id,
+        deviceId: deviceId,
         token: token,
         context: context
       );
@@ -53,6 +53,40 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
             context: context,
             callback: _CheckInPageState(),
             title: "you have checked in successfully",
+            type: Constant.success
+          );
+        }
+      });
+
+      _checkIn.catchError((value) {
+        Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
+        Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+        InfoDialog(
+            context: context,
+            callback: _CheckInPageState(),
+            title: value,
+            type: Constant.ALERT
+          );
+      });
+    }
+
+    submitCheckOut() async{
+      String token = Provider.of<Auth>(context, listen: false).getTokenFun();
+      Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
+      
+
+      var _checkIn = checkOutApi(
+        token: token,
+        context: context
+      );
+
+      _checkIn.then((value) {
+        if (value == true) {
+          Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+          InfoDialog(
+            context: context,
+            callback: _CheckInPageState(),
+            title: "you have checked out successfully",
             type: Constant.success
           );
         }
@@ -95,6 +129,7 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
           // Check user credentials are correct and route to the home screen
+          submitCheckOut();
         },
         child: Text(
           "CheckOut",
