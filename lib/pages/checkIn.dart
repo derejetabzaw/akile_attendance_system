@@ -73,9 +73,12 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
     submitCheckOut() async{
       String token = Provider.of<Auth>(context, listen: false).getTokenFun();
       Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
+      String deviceId = await DeviceId.getID;
+
       
 
       var _checkIn = checkOutApi(
+        deviceId: deviceId,
         token: token,
         context: context
       );

@@ -92,16 +92,21 @@ checkInApi({deviceId, token, context}) async {
 }
 
 /*================== Checkout Api ===============================*/
-checkOutApi({token, context}) async {
+checkOutApi({token, deviceId, context}) async {
   Map<String, String> headers = {
     "Content-type": "application/json",
     "Authorization": token
     };
+  var params = {
+  "deviceId": deviceId,
+  };
 
   String error;
   try {
     final response = await http.post(API.CHECKOUT,
-        headers: headers);
+        headers: headers,
+        body: json.encode(params)
+        );
     switch (response.statusCode) {
       case 200:
         return true;
