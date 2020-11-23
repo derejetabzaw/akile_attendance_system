@@ -11,5 +11,5 @@ final  Color TRIAL_COLOR = Colors.grey[200];
 
 
 
-const Color PRIMARY_COLOR=Colors.blue;
+const Color PRIMARY_COLOR=Colors.brown;
 const Color SECONDARY_COLOR=Colors.white;
