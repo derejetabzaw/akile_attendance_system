@@ -2,6 +2,7 @@ import 'package:akile_attendance_system/utilities/abstract_classes/confirmation_
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:akile_attendance_system/constants/constant.dart';
+import 'package:akile_attendance_system/pages/dialog/confirmationDialog.dart';
 import 'package:akile_attendance_system/state/appState.dart';
 import 'package:akile_attendance_system/api/auth.dart';
 import 'package:akile_attendance_system/pages/dialog/infoDialog.dart';
@@ -70,42 +71,7 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
       });
     }
 
-    submitCheckOut() async{
-      String token = Provider.of<Auth>(context, listen: false).getTokenFun();
-      Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
-      String deviceId = await DeviceId.getID;
-
-      
-
-      var _checkIn = checkOutApi(
-        deviceId: deviceId,
-        token: token,
-        context: context
-      );
-
-      _checkIn.then((value) {
-        if (value == true) {
-          Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
-          InfoDialog(
-            context: context,
-            callback: _CheckInPageState(),
-            title: "you have checked out successfully",
-            type: Constant.success
-          );
-        }
-      });
-
-      _checkIn.catchError((value) {
-        Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
-        Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
-        InfoDialog(
-            context: context,
-            callback: _CheckInPageState(),
-            title: value,
-            type: Constant.ALERT
-          );
-      });
-    }
+    
 
     final checkInButton = Material(
       elevation: 5.0,
@@ -132,7 +98,10 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
           // Check user credentials are correct and route to the home screen
-          submitCheckOut();
+          ConfirmationDialog(
+            context: context,
+            title: "Are you sure to checkout?",
+            callback: _CheckInPageState()); 
         },
         child: Text(
           "CheckOut",
@@ -205,7 +174,45 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
     );
   }
 
+  submitCheckOut(context) async{
+      String token = Provider.of<Auth>(context, listen: false).getTokenFun();
+      Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
+      String deviceId = await DeviceId.getID;
+
+      
+
+      var _checkIn = checkOutApi(
+        deviceId: deviceId,
+        token: token,
+        context: context
+      );
+
+      _checkIn.then((value) {
+        if (value == true) {
+          Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+          InfoDialog(
+            context: context,
+            callback: _CheckInPageState(),
+            title: "you have checked out successfully",
+            type: Constant.success
+          );
+        }
+      });
+
+      _checkIn.catchError((value) {
+        Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
+        Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+        InfoDialog(
+            context: context,
+            callback: _CheckInPageState(),
+            title: value,
+            type: Constant.ALERT
+          );
+      });
+    }
+
   @override
   void changer({context, id}) {
+    submitCheckOut(context);
   }
 }
