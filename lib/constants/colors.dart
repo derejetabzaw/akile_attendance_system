@@ -9,7 +9,5 @@ const Color COLOR_LINK = Colors.blue;
 
 final  Color TRIAL_COLOR = Colors.grey[200];
 
-
-
 const Color PRIMARY_COLOR=Color(0X4f100a);
 const Color SECONDARY_COLOR=Colors.white;
