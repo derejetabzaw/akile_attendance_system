@@ -16,7 +16,7 @@ dependencies:
   cached_network_image: 2.0.0-rc.1
   device_id: ^0.2.0
   flutter_launcher_icons: ^0.8.1
-
+  geolocator: ^6.1.13
 dev_dependencies:
   flutter_test:
     sdk: flutter

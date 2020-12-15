@@ -7,55 +7,52 @@ import 'package:akile_attendance_system/state/appState.dart';
 import 'package:akile_attendance_system/api/auth.dart';
 import 'package:akile_attendance_system/pages/dialog/infoDialog.dart';
 import 'package:device_id/device_id.dart';
-
-
-
+import 'package:geolocator/geolocator.dart';
 
 class CheckIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: CheckInPage());
+    return Scaffold(body: CheckInPage());
   }
 }
 
 class CheckInPage extends StatefulWidget {
   CheckInPage({Key key}) : super(key: key);
 
-
   _CheckInPageState createState() => _CheckInPageState();
 }
 
-class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
+class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
   bool showError = false;
 
   @override
   Widget build(BuildContext context) {
-
-    submitCheckIn() async{
+    submitCheckIn() async {
       // const String deviceId = "123";
       String deviceId = await DeviceId.getID;
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      // Position position = await Geolocator.getLastKnownPosition();
+
       print("the device id is");
       print(deviceId);
       String token = Provider.of<Auth>(context, listen: false).getTokenFun();
       Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
-      
 
       var _checkIn = checkInApi(
-        deviceId: deviceId,
-        token: token,
-        context: context
-      );
+          deviceId: deviceId,
+          position: position,
+          token: token,
+          context: context);
 
       _checkIn.then((value) {
         if (value == true) {
           Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
           InfoDialog(
-            context: context,
-            callback: _CheckInPageState(),
-            title: "you have checked in successfully",
-            type: Constant.success
-          );
+              context: context,
+              callback: _CheckInPageState(),
+              title: "you have checked in successfully",
+              type: Constant.success);
         }
       });
 
@@ -66,12 +63,9 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
             context: context,
             callback: _CheckInPageState(),
             title: value,
-            type: Constant.ALERT
-          );
+            type: Constant.ALERT);
       });
     }
-
-    
 
     final checkInButton = Material(
       elevation: 5.0,
@@ -99,9 +93,9 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
         onPressed: () {
           // Check user credentials are correct and route to the home screen
           ConfirmationDialog(
-            context: context,
-            title: "Are you sure to checkout?",
-            callback: _CheckInPageState()); 
+              context: context,
+              title: "Are you sure you want to checkout?",
+              callback: _CheckInPageState());
         },
         child: Text(
           "CheckOut",
@@ -174,42 +168,35 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp{
     );
   }
 
-  submitCheckOut(context) async{
-      String token = Provider.of<Auth>(context, listen: false).getTokenFun();
-      Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
-      String deviceId = await DeviceId.getID;
+  submitCheckOut(context) async {
+    String token = Provider.of<Auth>(context, listen: false).getTokenFun();
+    Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
+    String deviceId = await DeviceId.getID;
 
-      
+    var _checkIn =
+        checkOutApi(deviceId: deviceId, token: token, context: context);
 
-      var _checkIn = checkOutApi(
-        deviceId: deviceId,
-        token: token,
-        context: context
-      );
-
-      _checkIn.then((value) {
-        if (value == true) {
-          Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
-          InfoDialog(
-            context: context,
-            callback: _CheckInPageState(),
-            title: "you have checked out successfully",
-            type: Constant.success
-          );
-        }
-      });
-
-      _checkIn.catchError((value) {
-        Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
+    _checkIn.then((value) {
+      if (value == true) {
         Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
         InfoDialog(
             context: context,
             callback: _CheckInPageState(),
-            title: value,
-            type: Constant.ALERT
-          );
-      });
-    }
+            title: "Checked out successfully",
+            type: Constant.success);
+      }
+    });
+
+    _checkIn.catchError((value) {
+      Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
+      Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+      InfoDialog(
+          context: context,
+          callback: _CheckInPageState(),
+          title: value,
+          type: Constant.ALERT);
+    });
+  }
 
   @override
   void changer({context, id}) {
