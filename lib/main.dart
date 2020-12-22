@@ -47,9 +47,8 @@ class _AkileAttendanceApp extends State<AkileAttendanceApp> {
   build(context) {
     AppState themeNotifier = Provider.of<AppState>(context);
     return MaterialApp(
-      showSemanticsDebugger: false,
+        showSemanticsDebugger: false,
         debugShowCheckedModeBanner: false,
-
         initialRoute: logged == true ? Constant.HOME : Constant.SIGN_IN,
         theme: themeNotifier.getTheme(),
         routes: {
