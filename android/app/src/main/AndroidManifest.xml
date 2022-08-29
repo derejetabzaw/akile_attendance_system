@@ -10,6 +10,8 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="Akile"
         android:icon="@mipmap/launcher_icon">
+        <!-- android:name="io.flutter.app.FlutterApplication" -->
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -44,5 +46,6 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="16" /> -->
     </application>
 </manifest>
