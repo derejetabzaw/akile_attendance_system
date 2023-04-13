@@ -8,6 +8,7 @@ import 'package:akile_attendance_system/api/auth.dart';
 import 'package:akile_attendance_system/pages/dialog/infoDialog.dart';
 import 'package:device_id/device_id.dart';
 import 'package:geolocator/geolocator.dart';
+//import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 
 class CheckIn extends StatelessWidget {
   @override
@@ -24,6 +25,9 @@ class CheckInPage extends StatefulWidget {
 
 class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
   bool showError = false;
+ var _isIPressed=true;
+ var _isOPressed=true;
+
 
   @override
   Widget build(BuildContext context) {
@@ -66,17 +70,26 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
             type: Constant.ALERT);
       });
     }
-
+   void _myCallBack(){
+      setState((){
+        _isIPressed=true;
+        _isOPressed=true;
+      });
+   }
     final checkInButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(15.0),
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {
+        onPressed:_isIPressed
+          ? () {
           // Check user credentials are correct and route to the home screen
           submitCheckIn();
-        },
+          setState(()=> _isIPressed =false);
+          setState(()=> _isOPressed =true);
+        }
+        :null,
         child: Text(
           "CheckIn",
           textAlign: TextAlign.center,
@@ -90,13 +103,17 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {
+        onPressed:_isOPressed
+          ? () {
           // Check user credentials are correct and route to the home screen
           ConfirmationDialog(
               context: context,
               title: "Are you sure you want to checkout?",
               callback: _CheckInPageState());
-        },
+          setState(()=> _isOPressed =false);
+          setState(()=> _isIPressed =true);
+        }
+        :null,
         child: Text(
           "CheckOut",
           textAlign: TextAlign.center,
@@ -154,6 +171,8 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                // SizedBox(height: 15.0),
+                // getU(),
                 SizedBox(height: 15.0),
                 workedHours(),
                 SizedBox(height: 35.0),
@@ -174,7 +193,7 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
     String deviceId = await DeviceId.getID;
 
     var _checkIn =
-        checkOutApi(deviceId: deviceId, token: token, context: context);
+    checkOutApi(deviceId: deviceId, token: token, context: context);
 
     _checkIn.then((value) {
       if (value == true) {
