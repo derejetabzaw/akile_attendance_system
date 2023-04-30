@@ -4,6 +4,7 @@ import 'package:akile_attendance_system/constants/colors.dart';
 import 'package:akile_attendance_system/constants/constant.dart';
 import 'package:akile_attendance_system/pages/sharedPreference/sharedPreference.dart';
 import 'package:akile_attendance_system/pages/home.dart';
+import 'package:akile_attendance_system/pages/passwordchange.dart';
 import 'package:akile_attendance_system/pages/logo/logo.dart';
 import 'package:akile_attendance_system/pages/slider/slider.dart';
 import 'package:akile_attendance_system/pages/widgets/circularProgressBar.dart';
@@ -11,6 +12,20 @@ import 'package:akile_attendance_system/pages/widgets/clip_shape.dart';
 import 'package:akile_attendance_system/state/appState.dart';
 import 'package:akile_attendance_system/utilities/validation.dart';
 import 'package:provider/provider.dart';
+import 'package:device_id/device_id.dart';
+import 'package:akile_attendance_system/utilities/abstract_classes/confirmation_abstract.dart';
+import 'package:akile_attendance_system/pages/dialog/confirmationDialog.dart';
+import 'package:akile_attendance_system/state/appState.dart';
+import 'package:akile_attendance_system/pages/dialog/infoDialog.dart';
+// import 'package:mongo_dart/mongo_dart.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:akile_attendance_system/api/endpoints.dart';
+import 'package:akile_attendance_system/api/model/login.dart';
+import 'package:akile_attendance_system/api/errorResponse.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class SignInPage extends StatefulWidget {
   final String title;
@@ -60,47 +75,113 @@ class _LoginPageState extends State<SignInPage> {
       );
       _loginModel.then((value) async {
         savePref(
-          accessToken: value.accessToken,
-          staffId: value.staffId
+            accessToken: value.accessToken,
+            staffId: value.staffId
         );
         Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+        if(passwordController.text!="12345"){
         Navigator.push(context, SlideLeftRoute(
             page: Home()
         ));
+       }
+        else{
+          Navigator.push(context, SlideLeftRoute(
+              page: PasswordChangePage()
+        ));
+        }
+
+
+        String deviceId = await DeviceId.getID;
+        print("the device id is");
+        print(deviceId);
+
+
+///////////    ////// beginning
+        // the code below is suppose to save the device id if it is not 12345
+        final String currentDeviceId = '12345'; // replace with your current device ID
+
+        if (deviceId != currentDeviceId) {
+          final response = await http.put(
+            API.LOGIN_API,
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'deviceId': deviceId,
+            }),
+          );
+
+          if (response.statusCode == 200) {
+            print('Device ID updated successfully');
+          } else {
+            throw Exception('Failed1 to update document: ${response.body}');
+          }
+        }
+//// ////////////////////  end
+
+
+
+
+
+////////////////   beginning
+// //  the code below  is also  suppose to save the user deviceId  if it is not 12345
+// but it uses import 'package:mongo_dart/mongo_dart.dart'; which is commented at line 21 of this file
+
+
+        // final oldDeviceId = '12345';
+        // final collection = API.LOGIN_API.collection('test.users');
+        // await collection.update(
+        //   where.eq('deviceId', oldDeviceId),
+        //   modify.set('deviceId', deviceId),
+        // );
+
+
+    /////////////////     end
+
       });
 
       _loginModel.catchError((value) async {
         Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
         Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+
+
       });
     }
     else {
       Provider.of<Auth>(context, listen: false).setHasErrorFun("");
+
     }
+  //
   }
+
+ 
+
+
   submitButton() {
     return
       Row(
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child:  RawMaterialButton(
-            onPressed: () {
-              submitForm();
-            },
-            child: new Icon(
-              Icons.arrow_forward,
-              color: TRIAL_COLOR,
-              size: 35.0,
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child:  RawMaterialButton(
+              onPressed: () {
+                submitForm();
+                // updateDeviceId();
+
+              },
+              child: new Icon(
+                Icons.arrow_forward,
+                color: TRIAL_COLOR,
+                size: 35.0,
+              ),
+              shape: new CircleBorder(),
+              elevation: 2.0,
+              fillColor:PRIMARY_COLOR,
+              padding: const EdgeInsets.all(15.0),
             ),
-            shape: new CircleBorder(),
-            elevation: 2.0,
-            fillColor:PRIMARY_COLOR,
-            padding: const EdgeInsets.all(15.0),
-          ),
-        )
-      ],
-    );
+          )
+        ],
+      );
   }
 
 
@@ -129,8 +210,8 @@ class _LoginPageState extends State<SignInPage> {
         SizedBox(
           height: 5,
         ),
-        (showError == true && staffIdError.isNotEmpty) ? 
-        Text(staffIdError, style: TextStyle(color: Colors.red)) : 
+        (showError == true && staffIdError.isNotEmpty) ?
+        Text(staffIdError, style: TextStyle(color: Colors.red)) :
         Container(),
       ],
     );
@@ -160,13 +241,13 @@ class _LoginPageState extends State<SignInPage> {
             ),
           ),
         ),
-        (showError == true && passwordError.isNotEmpty) ? 
-        Text(passwordError, style: TextStyle(color: Colors.red)) : 
+        (showError == true && passwordError.isNotEmpty) ?
+        Text(passwordError, style: TextStyle(color: Colors.red)) :
         Container(),
       ],
     );
   }
-  
+
   headerTextRow() {
     return Container(
       margin: EdgeInsets.only(left: 15.0),
@@ -206,12 +287,12 @@ class _LoginPageState extends State<SignInPage> {
             height: 15,
           )
           ,
-      Consumer<Auth>(
-                    builder: (BuildContext context, Auth value, Widget child) =>
-                    value.getHasErrorFun().toString().isNotEmpty == true ?
-                    Text(value.getHasErrorFun(),style: TextStyle(color: Colors.red)) :
-                    Container(),
-                  ),
+          Consumer<Auth>(
+            builder: (BuildContext context, Auth value, Widget child) =>
+            value.getHasErrorFun().toString().isNotEmpty == true ?
+            Text(value.getHasErrorFun(),style: TextStyle(color: Colors.red)) :
+            Container(),
+          ),
           SizedBox(
             height: 20,
           ),
@@ -225,23 +306,28 @@ class _LoginPageState extends State<SignInPage> {
     return Scaffold(
       body:Provider.of<Auth>(context).getIsLoadingFun() == true
           ? circularIndicator(context: context):
-          SingleChildScrollView(
+      SingleChildScrollView(
           child:Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Provider.of<AppState>(context).getTheme()==Constant.lightTheme?
               clipShape(context)
-              :SizedBox(height: 100,),
+                  :SizedBox(height: 100,),
               Padding(
                 padding: EdgeInsets.only(bottom: 20),
                 child: forms(),
               ),
             ],
           )
-        ),
-      );
+      ),
+    );
   }
 }
+
+
+
+
+
 
 
