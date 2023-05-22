@@ -17,7 +17,8 @@ import 'package:akile_attendance_system/utilities/abstract_classes/confirmation_
 import 'package:akile_attendance_system/pages/dialog/confirmationDialog.dart';
 import 'package:akile_attendance_system/state/appState.dart';
 import 'package:akile_attendance_system/pages/dialog/infoDialog.dart';
-// import 'package:mongo_dart/mongo_dart.dart';
+import 'package:akile_attendance_system/api/model/login.dart';
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:akile_attendance_system/api/endpoints.dart';
@@ -44,6 +45,7 @@ class _LoginPageState extends State<SignInPage> {
   bool _secureText = true;
   bool isDark = false;
   String staffIdError = "", passwordError = "";
+
 
 
   @override
@@ -96,47 +98,34 @@ class _LoginPageState extends State<SignInPage> {
         print(deviceId);
 
 
-///////////    ////// beginning
+///////////   ////////////////////////////////////////////////////////// ////// beginning
         // the code below is suppose to save the device id if it is not 12345
-        final String currentDeviceId = '12345'; // replace with your current device ID
+         final String currentDeviceId = '12345'; //
 
         if (deviceId != currentDeviceId) {
-          final response = await http.put(
+          final response = await http.post(
             API.LOGIN_API,
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
             body: jsonEncode(<String, String>{
+              'currentDeviceId': '12345',
               'deviceId': deviceId,
+              'staffId': staffIdController.text,
+              'password': passwordController.text,
             }),
           );
 
           if (response.statusCode == 200) {
             print('Device ID updated successfully');
           } else {
-            throw Exception('Failed1 to update document: ${response.body}');
+            print('Failed to update device ID: ${response.body}');
+            throw Exception('Failed to update device ID');
+
           }
         }
-//// ////////////////////  end
 
-
-
-
-
-////////////////   beginning
-// //  the code below  is also  suppose to save the user deviceId  if it is not 12345
-// but it uses import 'package:mongo_dart/mongo_dart.dart'; which is commented at line 21 of this file
-
-
-        // final oldDeviceId = '12345';
-        // final collection = API.LOGIN_API.collection('test.users');
-        // await collection.update(
-        //   where.eq('deviceId', oldDeviceId),
-        //   modify.set('deviceId', deviceId),
-        // );
-
-
-    /////////////////     end
+//// ///////////////////////////////////////////////////////////////////////////////  end
 
       });
 
@@ -151,10 +140,8 @@ class _LoginPageState extends State<SignInPage> {
       Provider.of<Auth>(context, listen: false).setHasErrorFun("");
 
     }
-  //
   }
 
- 
 
 
   submitButton() {
@@ -324,6 +311,9 @@ class _LoginPageState extends State<SignInPage> {
     );
   }
 }
+
+
+
 
 
 
