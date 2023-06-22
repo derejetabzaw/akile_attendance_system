@@ -5,13 +5,18 @@ import 'package:akile_attendance_system/api/endpoints.dart';
 import 'package:akile_attendance_system/api/model/login.dart';
 import 'package:akile_attendance_system/api/errorResponse.dart';
 import 'package:http/http.dart' as http;
+//
+import 'package:shared_preferences/shared_preferences.dart';
 
 /*================== Login Api ===============================*/
-Future<JsonUser> loginApi({staffId, password, context}) async {
+Future<JsonUser> loginApi({deviceId,staffId,password,Newpassword,Confirmpassword,context}) async {
   Map<String, String> headers = {"Content-type": "application/json"};
   var params = {
+    "deviceId": deviceId,
     "staffId": staffId,
     "password": password,
+    "Newpassword": Newpassword,
+    "Confirmpassword": Confirmpassword,
   };
 
   String error;
@@ -43,6 +48,8 @@ Future<JsonUser> loginApi({staffId, password, context}) async {
     throw error;
   }
 }
+
+
 
 /*================== Checkin Api ===============================*/
 checkInApi({deviceId, position, token, context}) async {

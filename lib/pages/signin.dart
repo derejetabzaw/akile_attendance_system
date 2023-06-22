@@ -98,7 +98,7 @@ class _LoginPageState extends State<SignInPage> {
         print(deviceId);
 
 
-///////////   ////////////////////////////////////////////////////////// ////// beginning
+///////////    ////// beginning
         // the code below is suppose to save the device id if it is not 12345
          final String currentDeviceId = '12345'; //
 
@@ -125,7 +125,15 @@ class _LoginPageState extends State<SignInPage> {
           }
         }
 
-//// ///////////////////////////////////////////////////////////////////////////////  end
+
+
+//// ////////////////////  end
+
+
+
+
+
+
 
       });
 
@@ -311,6 +319,7 @@ class _LoginPageState extends State<SignInPage> {
     );
   }
 }
+
 
 
 
