@@ -3,6 +3,7 @@ import 'package:akile_attendance_system/constants/colors.dart';
 
 class Constant{
   static const String SIGN_IN ='signIn';
+  static const String SIGN_UP ='signUp';
   static const String HOME ='home';
   static const String SEARCH="search";
   static const String SETTING="Settings";
@@ -29,7 +30,7 @@ class Constant{
     backgroundColor: TRIAL_COLOR,
     primaryColor: lightPrimary,
 
-    indicatorColor: PRIMARY_COLOR,
+    // indicatorColor: PRIMARY_COLOR,
     brightness: Brightness.light,
     bottomAppBarTheme: BottomAppBarTheme(
 

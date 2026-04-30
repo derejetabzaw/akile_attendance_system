@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:akile_attendance_system/constants/constant.dart';
 import 'package:akile_attendance_system/pages/home.dart';
 import 'package:akile_attendance_system/pages/signin.dart';
+import 'package:akile_attendance_system/pages/signup.dart';
 import 'package:akile_attendance_system/state/appState.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,6 +54,7 @@ class _AkileAttendanceApp extends State<AkileAttendanceApp> {
         theme: themeNotifier.getTheme(),
         routes: {
           Constant.SIGN_IN: (context) => SignInPage(),
+          Constant.SIGN_UP: (context) => SignUpPage(),
           Constant.HOME: (context) => Home(),
         });
   }

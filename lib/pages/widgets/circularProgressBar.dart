@@ -11,7 +11,7 @@ circularIndicator({context}) {
           child: Opacity(
         opacity: 0.5,
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation(PRIMARY_COLOR),
+          valueColor: AlwaysStoppedAnimation(Colors.white),
           strokeWidth: 5.0,
           backgroundColor: Colors.red,
         ),

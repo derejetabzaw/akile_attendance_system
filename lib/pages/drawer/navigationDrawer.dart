@@ -114,7 +114,7 @@ class _SideDrawer extends State<SideDrawer> implements ShouldImp {
                                 text: getRoundLetter(getStaffId(context))
                                     .toUpperCase(),
                                 shapeType: ShapeType.circle,
-                                shapeColor: PRIMARY_COLOR.withOpacity(0.5),
+                                // shapeColor: PRIMARY_COLOR.withOpacity(0.5),
                                 shapeSize: 60,
                                 fontSize: 30,
                                 borderWidth: 1,

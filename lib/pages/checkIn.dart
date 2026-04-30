@@ -8,7 +8,6 @@ import 'package:akile_attendance_system/api/auth.dart';
 import 'package:akile_attendance_system/pages/dialog/infoDialog.dart';
 import 'package:device_id/device_id.dart';
 import 'package:geolocator/geolocator.dart';
-//import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 
 class CheckIn extends StatelessWidget {
   @override
@@ -25,18 +24,69 @@ class CheckInPage extends StatefulWidget {
 
 class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
   bool showError = false;
- var _isIPressed=true;
- var _isOPressed=true;
+  var _isIPressed = true;
+  var _isOPressed = true;
+  String _totalWorkedHours = "0.00";
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchWorkedHours();
+    _fetchAttendanceStatus();
+  }
+
+  void _fetchAttendanceStatus() async {
+    try {
+      String token = Provider.of<Auth>(context, listen: false).getTokenFun();
+      String userId = Provider.of<Auth>(context, listen: false).getId();
+      if (token != null && userId != null && userId.isNotEmpty) {
+        var statusData = await getAttendanceStatusApi(token: token, userId: userId);
+        if (mounted) {
+          setState(() {
+            if (statusData['status'] == 'checkedIn') {
+              _isIPressed = false;
+              _isOPressed = true;
+            } else {
+              _isIPressed = true;
+              _isOPressed = false;
+              // If recordCount is 0, they haven't checked in yet today, so CheckOut should be disabled
+              // If status is checkedOut and recordCount > 0, they can check in again (up to limit)
+              if (statusData['recordCount'] == 0) {
+                _isOPressed = false;
+              }
+            }
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetching attendance status: $e");
+    }
+  }
+
+  void _fetchWorkedHours() async {
+    try {
+      String token = Provider.of<Auth>(context, listen: false).getTokenFun();
+      String userId = Provider.of<Auth>(context, listen: false).getId();
+      if (token != null && userId != null && userId.isNotEmpty) {
+        var summary = await getWorkedHoursApi(token: token, userId: userId);
+        if (mounted) {
+          setState(() {
+            double hours = (summary['totalWorkedHours'] ?? 0.0).toDouble();
+            _totalWorkedHours = hours.toStringAsFixed(2);
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetching worked hours: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     submitCheckIn() async {
-      // const String deviceId = "123";
       String deviceId = await DeviceId.getID;
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      // Position position = await Geolocator.getLastKnownPosition();
 
       print("the device id is");
       print(deviceId);
@@ -52,6 +102,8 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
       _checkIn.then((value) {
         if (value == true) {
           Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+          _fetchWorkedHours();
+          _fetchAttendanceStatus();
           InfoDialog(
               context: context,
               callback: _CheckInPageState(),
@@ -70,26 +122,27 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
             type: Constant.ALERT);
       });
     }
-   void _myCallBack(){
-      setState((){
-        _isIPressed=true;
-        _isOPressed=true;
+
+    void _myCallBack() {
+      setState(() {
+        _isIPressed = true;
+        _isOPressed = true;
       });
-   }
+    }
+
     final checkInButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(15.0),
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed:_isIPressed
-          ? () {
-          // Check user credentials are correct and route to the home screen
-          submitCheckIn();
-          setState(()=> _isIPressed =false);
-          setState(()=> _isOPressed =true);
-        }
-        :null,
+        onPressed: _isIPressed
+            ? () {
+                submitCheckIn();
+                setState(() => _isIPressed = false);
+                setState(() => _isOPressed = true);
+              }
+            : null,
         child: Text(
           "CheckIn",
           textAlign: TextAlign.center,
@@ -103,17 +156,16 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed:_isOPressed
-          ? () {
-          // Check user credentials are correct and route to the home screen
-          ConfirmationDialog(
-              context: context,
-              title: "Are you sure you want to checkout?",
-              callback: _CheckInPageState());
-          setState(()=> _isOPressed =false);
-          setState(()=> _isIPressed =true);
-        }
-        :null,
+        onPressed: _isOPressed
+            ? () {
+                ConfirmationDialog(
+                    context: context,
+                    title: "Are you sure you want to checkout?",
+                    callback: _CheckInPageState());
+                setState(() => _isOPressed = false);
+                setState(() => _isIPressed = true);
+              }
+            : null,
         child: Text(
           "CheckOut",
           textAlign: TextAlign.center,
@@ -134,20 +186,28 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "Total Worked hours",
+                  "Total Worked Hours",
                   style: TextStyle(
                     fontSize: 12.0,
                     fontStyle: FontStyle.italic,
                   ),
                   textAlign: TextAlign.center,
                 ),
+                SizedBox(height: 8),
                 Text(
-                  "18:00",
+                  _totalWorkedHours,
                   style: TextStyle(
-                    fontSize: 12.0,
-                    fontStyle: FontStyle.italic,
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
+                ),
+                Text(
+                  "hours",
+                  style: TextStyle(
+                    fontSize: 10.0,
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
@@ -171,8 +231,6 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                // SizedBox(height: 15.0),
-                // getU(),
                 SizedBox(height: 15.0),
                 workedHours(),
                 SizedBox(height: 35.0),
@@ -193,11 +251,13 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
     String deviceId = await DeviceId.getID;
 
     var _checkIn =
-    checkOutApi(deviceId: deviceId, token: token, context: context);
+        checkOutApi(deviceId: deviceId, token: token, context: context);
 
     _checkIn.then((value) {
       if (value == true) {
         Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+        _fetchWorkedHours();
+        _fetchAttendanceStatus();
         InfoDialog(
             context: context,
             callback: _CheckInPageState(),

@@ -4,7 +4,7 @@ import 'package:akile_attendance_system/constants/colors.dart';
 import 'package:akile_attendance_system/constants/constant.dart';
 import 'package:akile_attendance_system/pages/sharedPreference/sharedPreference.dart';
 import 'package:akile_attendance_system/pages/home.dart';
-import 'package:akile_attendance_system/pages/passwordchange.dart';
+// import 'package:akile_attendance_system/pages/passwordchange.dart';
 import 'package:akile_attendance_system/pages/logo/logo.dart';
 import 'package:akile_attendance_system/pages/slider/slider.dart';
 import 'package:akile_attendance_system/pages/widgets/circularProgressBar.dart';
@@ -81,16 +81,20 @@ class _LoginPageState extends State<SignInPage> {
             staffId: value.staffId
         );
         Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
-        if(passwordController.text!="12345"){
+      //   if(passwordController.text!="12345"){
+      //   Navigator.push(context, SlideLeftRoute(
+      //       page: Home()
+      //   ));
+      //  }
+      //   else{
+      //     Navigator.push(context, SlideLeftRoute(
+      //         page: PasswordChangePage()
+      //   ));
+      //   }
+
         Navigator.push(context, SlideLeftRoute(
-            page: Home()
+          page: Home()
         ));
-       }
-        else{
-          Navigator.push(context, SlideLeftRoute(
-              page: PasswordChangePage()
-        ));
-        }
 
 
         String deviceId = await DeviceId.getID;
@@ -195,7 +199,7 @@ class _LoginPageState extends State<SignInPage> {
                 size: 20,
                 color: PRIMARY_COLOR,
               ),
-              hintText: "Staff Id",
+              hintText: "Staff ID, Email or Phone",
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
                   borderSide: BorderSide.none),
@@ -292,6 +296,27 @@ class _LoginPageState extends State<SignInPage> {
             height: 20,
           ),
           submitButton(),
+          SizedBox(height: 20),
+          // ── Sign Up link ─────────────────────────────────
+          GestureDetector(
+            onTap: () => Navigator.of(context).pushNamed(Constant.SIGN_UP),
+            child: RichText(
+              text: TextSpan(
+                text: "Don't have an account? ",
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                children: [
+                  TextSpan(
+                    text: 'Sign Up',
+                    style: TextStyle(
+                      color: PRIMARY_COLOR,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
