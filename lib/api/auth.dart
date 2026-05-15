@@ -115,7 +115,7 @@ Future<String> registerApi({
 checkInApi({deviceId, position, token, context}) async {
   Map<String, String> headers = {
     "Content-type": "application/json",
-    "Authorization": token
+    "Authorization": "Bearer $token"
   };
 
   var params = {
@@ -157,7 +157,7 @@ checkInApi({deviceId, position, token, context}) async {
 checkOutApi({token, deviceId, context}) async {
   Map<String, String> headers = {
     "Content-type": "application/json",
-    "Authorization": token
+    "Authorization": "Bearer $token"
   };
   var params = {
     "deviceId": deviceId,
@@ -197,7 +197,7 @@ checkOutApi({token, deviceId, context}) async {
 Future<Map<String, dynamic>> getWorkedHoursApi({String token, String userId}) async {
   Map<String, String> headers = {
     "Content-type": "application/json",
-    "Authorization": token
+    "Authorization": "Bearer $token"
   };
 
   String error;
@@ -211,14 +211,14 @@ Future<Map<String, dynamic>> getWorkedHoursApi({String token, String userId}) as
         return json.decode(response.body);
         break;
       default:
-        return {"totalWorkedHours": 0.0, "totalOT1": 0.0, "totalOT2": 0.0};
+        return {"totalWorkHours": 0.0, "totalOT1": 0.0, "totalOT2": 0.0};
     }
   } on SocketException catch (_) {
     error = 'No Internet connection 😑';
     throw error;
   } on Exception catch (_) {
     // Return defaults on error so the UI doesn't break
-    return {"totalWorkedHours": 0.0, "totalOT1": 0.0, "totalOT2": 0.0};
+    return {"totalWorkHours": 0.0, "totalOT1": 0.0, "totalOT2": 0.0};
   }
 }
 
@@ -226,7 +226,7 @@ Future<Map<String, dynamic>> getWorkedHoursApi({String token, String userId}) as
 Future<Map<String, dynamic>> getAttendanceStatusApi({String token, String userId}) async {
   Map<String, String> headers = {
     "Content-type": "application/json",
-    "Authorization": token
+    "Authorization": "Bearer $token"
   };
 
   try {
@@ -237,6 +237,7 @@ Future<Map<String, dynamic>> getAttendanceStatusApi({String token, String userId
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
+      print("Status Error: ${response.statusCode} - ${response.body}");
       return {"status": "checkedOut", "recordCount": 0};
     }
   } catch (e) {
@@ -249,7 +250,7 @@ Future<Map<String, dynamic>> getAttendanceStatusApi({String token, String userId
 Future<bool> changePasswordApi({String token, String oldPassword, String newPassword}) async {
   Map<String, String> headers = {
     "Content-type": "application/json",
-    "Authorization": token
+    "Authorization": "Bearer $token"
   };
   var params = {
     "oldPassword": oldPassword,
@@ -281,4 +282,3 @@ Future<bool> changePasswordApi({String token, String oldPassword, String newPass
     throw error;
   }
 }
-

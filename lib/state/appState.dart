@@ -63,15 +63,19 @@ class Auth with ChangeNotifier {
   String id = "";
   int page = 0;
 
-  // Check if a user id logedin
+  // Check if a user is logged in
   getIsLogged() async {
     final pref = await SharedPreferences.getInstance();
-    final token = pref.getBool("accessToken");
-    if (token.toString().isEmpty == true || token == null) {
+    final token = pref.getString("accessToken");
+    final storedId = pref.getString("id");
+    
+    if (token == null || token.isEmpty) {
       this.isLogged = false;
       notifyListeners();
     } else {
       this.isLogged = true;
+      this.token = token;
+      this.id = storedId ?? "";
       notifyListeners();
     }
   }
@@ -104,10 +108,13 @@ class Auth with ChangeNotifier {
   }
 
   getTokenFun() {
-    getSharedPreference("accessToken").then((token) async {
-      this.token = token;
-    });
-    return token;
+    return this.token;
+  }
+
+  void setTokenFun(String token) {
+    this.token = token;
+    this.isLogged = (token != null && token.isNotEmpty);
+    notifyListeners();
   }
 
   setHomePageTabFun(index) async {

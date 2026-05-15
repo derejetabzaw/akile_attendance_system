@@ -12,7 +12,10 @@ import 'package:geolocator/geolocator.dart';
 class CheckIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: CheckInPage());
+    return Scaffold(
+      backgroundColor: Color(0xFFF8FAFC),
+      body: CheckInPage()
+    );
   }
 }
 
@@ -26,7 +29,11 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
   bool showError = false;
   var _isIPressed = true;
   var _isOPressed = true;
-  String _totalWorkedHours = "0.00";
+  String _workHours = "0.0";
+  String _ot1 = "0.0";
+  String _ot2 = "0.0";
+  int _recordCount = 0;
+  String _status = "checkedOut";
 
   @override
   void initState() {
@@ -43,16 +50,17 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
         var statusData = await getAttendanceStatusApi(token: token, userId: userId);
         if (mounted) {
           setState(() {
-            if (statusData['status'] == 'checkedIn') {
+            _status = statusData['status'] ?? "checkedOut";
+            _recordCount = statusData['recordCount'] ?? 0;
+            
+            if (_status == 'checkedIn') {
               _isIPressed = false;
               _isOPressed = true;
             } else {
               _isIPressed = true;
               _isOPressed = false;
-              // If recordCount is 0, they haven't checked in yet today, so CheckOut should be disabled
-              // If status is checkedOut and recordCount > 0, they can check in again (up to limit)
-              if (statusData['recordCount'] == 0) {
-                _isOPressed = false;
+              if (_recordCount >= 3) {
+                 _isIPressed = false;
               }
             }
           });
@@ -71,8 +79,9 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
         var summary = await getWorkedHoursApi(token: token, userId: userId);
         if (mounted) {
           setState(() {
-            double hours = (summary['totalWorkedHours'] ?? 0.0).toDouble();
-            _totalWorkedHours = hours.toStringAsFixed(2);
+            _workHours = (summary['todayWorkHours'] ?? summary['totalWorkHours'] ?? 0.0).toDouble().toStringAsFixed(1);
+            _ot1 = (summary['totalOT1'] ?? 0.0).toDouble().toStringAsFixed(1);
+            _ot2 = (summary['totalOT2'] ?? 0.0).toDouble().toStringAsFixed(1);
           });
         }
       }
@@ -83,160 +92,177 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
 
   @override
   Widget build(BuildContext context) {
-    submitCheckIn() async {
-      String deviceId = await DeviceId.getID;
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-
-      print("the device id is");
-      print(deviceId);
-      String token = Provider.of<Auth>(context, listen: false).getTokenFun();
-      Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
-
-      var _checkIn = checkInApi(
-          deviceId: deviceId,
-          position: position,
-          token: token,
-          context: context);
-
-      _checkIn.then((value) {
-        if (value == true) {
-          Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
-          _fetchWorkedHours();
-          _fetchAttendanceStatus();
-          InfoDialog(
-              context: context,
-              callback: _CheckInPageState(),
-              title: "you have checked in successfully",
-              type: Constant.success);
-        }
-      });
-
-      _checkIn.catchError((value) {
-        Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
-        Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
-        InfoDialog(
-            context: context,
-            callback: _CheckInPageState(),
-            title: value,
-            type: Constant.ALERT);
-      });
-    }
-
-    void _myCallBack() {
-      setState(() {
-        _isIPressed = true;
-        _isOPressed = true;
-      });
-    }
-
-    final checkInButton = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(15.0),
-      child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: _isIPressed
-            ? () {
-                submitCheckIn();
-                setState(() => _isIPressed = false);
-                setState(() => _isOPressed = true);
-              }
-            : null,
-        child: Text(
-          "CheckIn",
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-
-    final checkOutButton = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(15.0),
-      child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: _isOPressed
-            ? () {
-                ConfirmationDialog(
-                    context: context,
-                    title: "Are you sure you want to checkout?",
-                    callback: _CheckInPageState());
-                setState(() => _isOPressed = false);
-                setState(() => _isIPressed = true);
-              }
-            : null,
-        child: Text(
-          "CheckOut",
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-
-    workedHours() {
-      return Center(
-        child: Container(
-          margin: EdgeInsets.all(10),
-          padding: EdgeInsets.all(10),
-          width: 200,
-          height: 200,
-          child: Center(
+    return SingleChildScrollView(
+      physics: AlwaysScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          _buildHeader(),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "Total Worked Hours",
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    fontStyle: FontStyle.italic,
-                  ),
-                  textAlign: TextAlign.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildCheckInCounter(),
+                SizedBox(height: 24),
+                _buildActionButtons(),
+                SizedBox(height: 30),
+                _buildDetailsCard(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(color: Color(0x334F46E5), blurRadius: 20, offset: Offset(0, 10)),
+        ],
+      ),
+      padding: EdgeInsets.fromLTRB(24, 60, 24, 40),
+      child: Column(
+        children: [
+          Text(
+            "Today's Work Duration",
+            style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+          SizedBox(height: 12),
+          Text(
+            "$_workHours h",
+            style: TextStyle(color: Colors.white, fontSize: 52, fontWeight: FontWeight.bold, letterSpacing: -1),
+          ),
+          SizedBox(height: 8),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _status == 'checkedIn' ? Icons.fiber_manual_record : Icons.pause_circle_filled,
+                  color: _status == 'checkedIn' ? Color(0xFF34D399) : Colors.white70,
+                  size: 14,
                 ),
-                SizedBox(height: 8),
+                SizedBox(width: 6),
                 Text(
-                  _totalWorkedHours,
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "hours",
-                  style: TextStyle(
-                    fontSize: 10.0,
-                    color: Colors.grey,
-                  ),
+                  _status == 'checkedIn' ? "Active Session" : "Paused",
+                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
           ),
-          decoration: BoxDecoration(
-            border: Border.all(width: 3),
-            borderRadius: BorderRadius.all(
-              Radius.circular(200),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckInCounter() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Check-ins Today", style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 16)),
+              Text("$_recordCount / 3", style: TextStyle(color: Color(0xFF4F46E5), fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
+          SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: _recordCount / 3,
+              backgroundColor: Color(0xFFF1F5F9),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
+              minHeight: 8,
             ),
           ),
-        ),
-      );
-    }
+          SizedBox(height: 8),
+          Text(
+            _recordCount >= 3 ? "Daily limit reached" : "You have ${3 - _recordCount} sessions left",
+            style: TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
 
-    return Scaffold(
-      body: Center(
-        child: Container(
-          child: Padding(
-            padding: EdgeInsets.all(36.0),
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: _actionButton(
+            label: "Check In",
+            icon: Icons.input, // Compatible icon
+            color: Color(0xFF4F46E5),
+            isActive: _isIPressed,
+            onTap: () => _submitCheckIn(),
+          ),
+        ),
+        SizedBox(width: 16),
+        Expanded(
+          child: _actionButton(
+            label: "Check Out",
+            icon: Icons.exit_to_app, // Compatible icon
+            color: Color(0xFFEF4444),
+            isActive: _isOPressed,
+            onTap: () {
+              ConfirmationDialog(
+                context: context,
+                title: "Ready to checkout?",
+                callback: this,
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _actionButton({String label, IconData icon, Color color, bool isActive, VoidCallback onTap}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isActive ? onTap : null,
+        borderRadius: BorderRadius.circular(20),
+        child: Opacity(
+          opacity: isActive ? 1.0 : 0.4,
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            decoration: BoxDecoration(
+              color: isActive ? Colors.white : Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: isActive ? color.withOpacity(0.2) : Colors.transparent, width: 2),
+              boxShadow: isActive ? [BoxShadow(color: color.withOpacity(0.1), blurRadius: 10, offset: Offset(0, 4))] : [],
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(height: 15.0),
-                workedHours(),
-                SizedBox(height: 35.0),
-                checkInButton,
-                SizedBox(height: 15.0),
-                checkOutButton
+              children: [
+                Icon(icon, color: isActive ? color : Colors.grey, size: 32),
+                SizedBox(height: 8),
+                Text(label, style: TextStyle(color: isActive ? color : Colors.grey, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -245,40 +271,67 @@ class _CheckInPageState extends State<CheckInPage> implements ShouldImp {
     );
   }
 
-  submitCheckOut(context) async {
+  Widget _buildDetailsCard() {
+    return Container(
+      padding: EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _statItem("OT 1", _ot1, Colors.orangeAccent),
+          Container(width: 1, height: 40, color: Colors.white10),
+          _statItem("OT 2", _ot2, Colors.redAccent),
+        ],
+      ),
+    );
+  }
+
+  Widget _statItem(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(label, style: TextStyle(color: Colors.white60, fontSize: 12)),
+        SizedBox(height: 4),
+        Text("$value h", style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  void _submitCheckIn() async {
+    String deviceId = await DeviceId.getID;
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    String token = Provider.of<Auth>(context, listen: false).getTokenFun();
+    Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
+
+    var result = await checkInApi(deviceId: deviceId, position: position, token: token, context: context);
+    Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+    
+    if (result == true) {
+      _fetchWorkedHours();
+      _fetchAttendanceStatus();
+      InfoDialog(context: context, callback: this, title: "Success! Clocked in.", type: Constant.success);
+    }
+  }
+
+  void _submitCheckOut() async {
     String token = Provider.of<Auth>(context, listen: false).getTokenFun();
     Provider.of<Auth>(context, listen: false).setLoadingStateFun(true);
     String deviceId = await DeviceId.getID;
 
-    var _checkIn =
-        checkOutApi(deviceId: deviceId, token: token, context: context);
+    var result = await checkOutApi(deviceId: deviceId, token: token, context: context);
+    Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
 
-    _checkIn.then((value) {
-      if (value == true) {
-        Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
-        _fetchWorkedHours();
-        _fetchAttendanceStatus();
-        InfoDialog(
-            context: context,
-            callback: _CheckInPageState(),
-            title: "Checked out successfully",
-            type: Constant.success);
-      }
-    });
-
-    _checkIn.catchError((value) {
-      Provider.of<Auth>(context, listen: false).setHasErrorFun(value);
-      Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
-      InfoDialog(
-          context: context,
-          callback: _CheckInPageState(),
-          title: value,
-          type: Constant.ALERT);
-    });
+    if (result == true) {
+      _fetchWorkedHours();
+      _fetchAttendanceStatus();
+      InfoDialog(context: context, callback: this, title: "Success! Clocked out.", type: Constant.success);
+    }
   }
 
   @override
   void changer({context, id}) {
-    submitCheckOut(context);
+    _submitCheckOut();
   }
 }

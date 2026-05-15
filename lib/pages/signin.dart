@@ -78,9 +78,13 @@ class _LoginPageState extends State<SignInPage> {
       _loginModel.then((value) async {
         savePref(
             accessToken: value.accessToken,
-            staffId: value.staffId
+            staffId: value.staffId,
+            id: value.userId
         );
-        Provider.of<Auth>(context, listen: false).setLoadingStateFun(false);
+        final auth = Provider.of<Auth>(context, listen: false);
+        auth.setTokenFun(value.accessToken);
+        auth.setId(value.userId);
+        auth.setLoadingStateFun(false);
       //   if(passwordController.text!="12345"){
       //   Navigator.push(context, SlideLeftRoute(
       //       page: Home()
@@ -170,13 +174,13 @@ class _LoginPageState extends State<SignInPage> {
               },
               child: new Icon(
                 Icons.arrow_forward,
-                color: TRIAL_COLOR,
-                size: 35.0,
+                color: Colors.white,
+                size: 32.0,
               ),
               shape: new CircleBorder(),
-              elevation: 2.0,
-              fillColor:PRIMARY_COLOR,
-              padding: const EdgeInsets.all(15.0),
+              elevation: 4.0,
+              fillColor: PRIMARY_COLOR,
+              padding: const EdgeInsets.all(18.0),
             ),
           )
         ],
@@ -303,14 +307,19 @@ class _LoginPageState extends State<SignInPage> {
             child: RichText(
               text: TextSpan(
                 text: "Don't have an account? ",
-                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                style: TextStyle(
+                  color: Provider.of<AppState>(context).getTheme() == Constant.darkTheme 
+                      ? Colors.white70 
+                      : Colors.black54, 
+                  fontSize: 14
+                ),
                 children: [
                   TextSpan(
                     text: 'Sign Up',
                     style: TextStyle(
                       color: PRIMARY_COLOR,
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
+                      fontSize: 14,
                     ),
                   ),
                 ],

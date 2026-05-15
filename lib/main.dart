@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:akile_attendance_system/constants/constant.dart';
 import 'package:akile_attendance_system/pages/home.dart';
+import 'package:akile_attendance_system/pages/notifications_panel.dart';
 import 'package:akile_attendance_system/pages/signin.dart';
 import 'package:akile_attendance_system/pages/signup.dart';
 import 'package:akile_attendance_system/state/appState.dart';
@@ -10,17 +11,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool logged = false;
-  if (prefs.getString("accessToken") != null ||
-      prefs.getString("accessToken").toString().isEmpty == true) {
-    logged = true;
+  
+  final String token = prefs.getString("accessToken");
+  final String id = prefs.getString("id");
+  final bool logged = (token != null && token.isNotEmpty);
+
+  // Initialize Auth provider state
+  final Auth authState = Auth();
+  if (logged) {
+    authState.isLogged = true;
+    authState.token = token;
+    authState.id = id ?? "";
   }
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppState()),
         ChangeNotifierProvider(create: (_) => LoginAuth()),
-        ChangeNotifierProvider(create: (_) => Auth()),
+        ChangeNotifierProvider.value(value: authState),
       ],
       child: AkileAttendanceApp(logged),
     ),
@@ -56,6 +65,7 @@ class _AkileAttendanceApp extends State<AkileAttendanceApp> {
           Constant.SIGN_IN: (context) => SignInPage(),
           Constant.SIGN_UP: (context) => SignUpPage(),
           Constant.HOME: (context) => Home(),
+          "/notifications": (context) => NotificationsPanel(),
         });
   }
 }

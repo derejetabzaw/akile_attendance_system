@@ -26,56 +26,56 @@ class Constant{
 
 
   static ThemeData lightTheme = ThemeData(
-    fontFamily: "TimesNewRoman",
-    backgroundColor: TRIAL_COLOR,
-    primaryColor: lightPrimary,
-
-    // indicatorColor: PRIMARY_COLOR,
+    primaryColor: PRIMARY_COLOR,
+    accentColor: SECONDARY_COLOR,
     brightness: Brightness.light,
-    bottomAppBarTheme: BottomAppBarTheme(
-
-      color: Colors.red,
+    scaffoldBackgroundColor: lightBG,
+    backgroundColor: lightBG,
+    appBarTheme: AppBarTheme(
+      color: PRIMARY_COLOR,
       elevation: 0,
-    ),
-      scaffoldBackgroundColor: TRIAL_COLOR,
-        appBarTheme: AppBarTheme(
-          color: PRIMARY_COLOR,
-          elevation: 0,
-          textTheme: TextTheme(
-            title: TextStyle(
-              fontFamily: "TimesNewRoman",
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      );
-  static ThemeData darkTheme = ThemeData(
-//    cardColor:COLOR_CREAM ,
-    brightness: Brightness.dark,
-    backgroundColor: darkBG,
-    primaryColor: darkPrimary,
-
-
-//    scaffoldBackgroundColor: darkBG,
-  textTheme: TextTheme(
-        title: TextStyle(
+      iconTheme: IconThemeData(color: Colors.white),
+      textTheme: TextTheme(
+        headline6: TextStyle(
           color: Colors.white,
-          fontSize: 20.0,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
-  ),
-  appBarTheme: AppBarTheme(
-    elevation: 0,
-    textTheme: TextTheme(
-      title: TextStyle(
-        fontFamily: "TimesNewRoman",
-        color: lightBG,
-        fontSize: 20,
-        fontWeight: FontWeight.w800,
-
       ),
     ),
-  ),
+    textTheme: TextTheme(
+      bodyText1: TextStyle(color: TEXT_COLOR_DARK),
+      bodyText2: TextStyle(color: TEXT_COLOR_DARK),
+      headline6: TextStyle(color: TEXT_COLOR_DARK, fontWeight: FontWeight.bold),
+    ),
+    buttonTheme: ButtonThemeData(
+      buttonColor: PRIMARY_COLOR,
+      textTheme: ButtonTextTheme.primary,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    ),
+  );
+  static ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    primaryColor: darkPrimary,
+    accentColor: SECONDARY_COLOR,
+    scaffoldBackgroundColor: darkBG,
+    backgroundColor: darkBG,
+    appBarTheme: AppBarTheme(
+      color: Color(0xFF1E293B),
+      elevation: 0,
+      iconTheme: IconThemeData(color: Colors.white),
+      textTheme: TextTheme(
+        headline6: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+    textTheme: TextTheme(
+      bodyText1: TextStyle(color: TEXT_COLOR_LIGHT),
+      bodyText2: TextStyle(color: TEXT_COLOR_LIGHT),
+      headline6: TextStyle(color: TEXT_COLOR_LIGHT, fontWeight: FontWeight.bold),
+    ),
   );
 }
