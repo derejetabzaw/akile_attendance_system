@@ -1,10 +1,11 @@
 class API {
-  // static const String BASE_API = "https://akile-attendance-system.herokuapp.com/api/v1/";
+  // --- PRODUCTION URL (Replace with your Render/Heroku backend URL) ---
+  static const String BASE_API = "https://akille-backend-server.onrender.com/api/v1/";
+  // static const String BASE_API = "http://192.168.1.6:9000/api/v1/";
+  
+  // --- LOCAL TESTING URLs (Uncomment to use locally) ---
+  // static const String BASE_API = "http://192.168.1.2:9000/api/v1/";
   // static const String BASE_API = "http://localhost:8081/api/v1/";
-
-  static const String BASE_API = "http://192.168.1.2:9000/api/v1/";
-
-  // static const String BASE_API = "https://hrserver.akillepainting.com/api/v1/";
   static const String LOGIN_API = BASE_API + "auth/login";
   static const String REGISTER_API = BASE_API + "auth/register";
   static const String CHECKIN = BASE_API + "users/checkin";
@@ -29,6 +30,11 @@ class API {
 
   // Mark all notifications as read — append userId
   static const String MARK_READ_ALL = BASE_API + "assignments/notifications/read-all/";
+
+  // Leave Management
+  static const String LEAVE_SUBMIT = BASE_API + "leave"; // POST to submit
+  static const String LEAVE_MY = BASE_API + "leave/my";   // GET own requests
+  static const String LEAVE_CANCEL = BASE_API + "leave/";  // DELETE + leaveId
 }
 
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:akile_attendance_system/pages/assignments.dart';
 import 'package:akile_attendance_system/pages/checkIn.dart';
+import 'package:akile_attendance_system/pages/leave_request.dart';
 import 'package:akile_attendance_system/pages/notifications_panel.dart';
 import 'package:akile_attendance_system/pages/drawer/navigationDrawer.dart';
 import 'package:akile_attendance_system/utilities/abstract_classes/confirmation_abstract.dart';
@@ -49,6 +50,8 @@ class HomePage extends State<Home> implements ShouldImp {
         return CheckIn();
       case 1:
         return Assignments();
+      case 2:
+        return LeaveRequestPage();
       default:
         return CheckIn();
     }
@@ -71,21 +74,23 @@ class HomePage extends State<Home> implements ShouldImp {
     final Color primaryIndigo = Color(0xFF4F46E5);
 
     return Scaffold(
-      extendBodyBehindAppBar: currentTab == 0, // Show content under app bar on home
-      appBar: currentTab == 0 
-        ? AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            iconTheme: IconThemeData(color: Colors.white),
-            actions: [_notificationsBadge()],
-          )
-        : AppBar(
-            backgroundColor: primaryIndigo,
-            title: Text("Assignments", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            elevation: 0,
-            iconTheme: IconThemeData(color: Colors.white),
-            actions: [_notificationsBadge()],
-          ),
+      extendBodyBehindAppBar: currentTab == 0,
+      appBar: currentTab == 2
+          ? null // LeaveRequestPage has its own AppBar
+          : currentTab == 0
+              ? AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  iconTheme: IconThemeData(color: Colors.white),
+                  actions: [_notificationsBadge()],
+                )
+              : AppBar(
+                  backgroundColor: primaryIndigo,
+                  title: Text("Assignments", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  elevation: 0,
+                  iconTheme: IconThemeData(color: Colors.white),
+                  actions: [_notificationsBadge()],
+                ),
       drawer: Container(
         width: getWidth(context) * 0.75,
         height: getHeight(context),
@@ -109,16 +114,23 @@ class HomePage extends State<Home> implements ShouldImp {
             BottomNavigationBarItem(
               icon: Padding(
                 padding: const EdgeInsets.only(bottom: 4.0),
-                child: Icon(Icons.home), // Compatible icon
+                child: Icon(Icons.home),
               ),
               title: Text('Home'),
             ),
             BottomNavigationBarItem(
               icon: Padding(
                 padding: const EdgeInsets.only(bottom: 4.0),
-                child: Icon(Icons.assignment), // Compatible icon
+                child: Icon(Icons.assignment),
               ),
               title: Text('Assignments'),
+            ),
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Icon(Icons.event_available),
+              ),
+              title: Text('Leave'),
             ),
           ],
           onTap: (index) {

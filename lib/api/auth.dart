@@ -51,7 +51,7 @@ Future<JsonUser> loginApi({
     error = "Bad response format 👎";
     throw error;
   } on Exception catch (_) {
-    error = "We have no idea what happend!";
+    error = "We have no idea what happened!";
     throw error;
   }
 }
@@ -148,7 +148,7 @@ checkInApi({deviceId, position, token, context}) async {
     error = "Bad response format 👎";
     throw error;
   } on Exception catch (_) {
-    error = "We have not idea what happend!";
+    error = "We have no idea what happened!";
     throw error;
   }
 }
@@ -188,7 +188,7 @@ checkOutApi({token, deviceId, context}) async {
     error = "Bad response format 👎";
     throw error;
   } on Exception catch (_) {
-    error = "We have no idea what happend!";
+    error = "We have no idea what happened!";
     throw error;
   }
 }

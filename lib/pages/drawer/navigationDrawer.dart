@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:akile_attendance_system/constants/colors.dart';
 import 'package:akile_attendance_system/constants/constant.dart';
+import 'package:akile_attendance_system/pages/leave_request.dart';
 import 'package:akile_attendance_system/pages/SharedPreference/sharedPreference.dart';
 import 'package:akile_attendance_system/pages/dialog/confirmationDialog.dart';
 import 'package:akile_attendance_system/pages/widgets/custom_shape.dart';
@@ -148,6 +149,17 @@ class _SideDrawer extends State<SideDrawer> implements ShouldImp {
                   //     context, SlideLeftRoute(page()));
                 },
                 title: _buildRow(Icons.timeline, "Change Password"),
+              ),
+              Divider(),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => LeaveRequestPage()),
+                  );
+                },
+                title: _buildRow(Icons.event_available, "Leave Requests"),
               ),
               Divider(),
               ListTile(
